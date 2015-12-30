@@ -22,6 +22,7 @@ nv.models.multiBarHorizontal = function() {
         , disabled // used in conjunction with barColor to communicate from multiBarHorizontalChart what series are disabled
         , stacked = false
         , showValues = false
+        , showSum = false // Shows the sum on top of a stacked bar
         , showBarLabels = false
         , valuePadding = 60
         , groupSpacing = 0.1
@@ -216,13 +217,21 @@ nv.models.multiBarHorizontal = function() {
 
             barsEnter.append('text');
 
-            if (showValues && !stacked) {
-                bars.select('text')
+            if (showValues) {
+                var barsText = bars.select('text');
+                if (!stacked) barsText
                     .attr('text-anchor', function(d,i) { return getY(d,i) < 0 ? 'end' : 'start' })
                     .attr('y', x.rangeBand() / (data.length * 2))
                     .attr('dy', '.32em')
-                    .text(function(d,i) {
-                        var t = valueFormat(getY(d,i))
+                    .attr('x', function(d,i) { return getY(d,i) < 0 ? -4 : y(getY(d,i)) - y(0) + 4 })
+                else barsText
+                    .attr('text-anchor', 'middle')
+                    .attr("dominant-baseline", "middle")
+                    .attr('y', x.rangeBand() / 2.0)
+                    //.attr('dy', '.32em')
+                    .attr('x', function(d,i) { return y(getY(d,i) / 2.0) - y(0) })
+                barsText.text(function(d,i) {
+                        var t = valueFormat(getY(d,i), d)
                             , yerr = getYerr(d,i);
                         if (yerr === undefined)
                             return t;
@@ -232,10 +241,20 @@ nv.models.multiBarHorizontal = function() {
                     });
                 bars.watchTransition(renderWatch, 'multibarhorizontal: bars')
                     .select('text')
-                    .attr('x', function(d,i) { return getY(d,i) < 0 ? -4 : y(getY(d,i)) - y(0) + 4 })
             } else {
                 bars.selectAll('text').text('');
             }
+
+            if (showSum && stacked)
+                d3.select(groups[0].slice(-1)[0]).selectAll('g').append('text').classed('nv-sum-label', true)
+                    .attr('text-anchor', 'start')
+                    .attr("dominant-baseline", "middle")
+                    .attr('y', x.rangeBand() / 2.0)
+                    .attr('x', function(d,i) { console.log(d); return y(getY(d,i)) - y(0) + 4 })
+                    .text(function(d,i) {
+                            var t = valueFormat(d.y1 + d.y, d, 'sum')
+                            return t;
+                        });
 
             if (showBarLabels && !stacked) {
                 barsEnter.append('text').classed('nv-bar-label',true);
@@ -324,6 +343,7 @@ nv.models.multiBarHorizontal = function() {
         forceY:  {get: function(){return forceY;}, set: function(_){forceY=_;}},
         stacked: {get: function(){return stacked;}, set: function(_){stacked=_;}},
         showValues: {get: function(){return showValues;}, set: function(_){showValues=_;}},
+        showSum: {get: function(){return showSum;}, set: function(_){showSum=_;}},
         // this shows the group name, seems pointless?
         //showBarLabels:    {get: function(){return showBarLabels;}, set: function(_){showBarLabels=_;}},
         disabled:     {get: function(){return disabled;}, set: function(_){disabled=_;}},
