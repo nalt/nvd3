@@ -226,7 +226,7 @@ nv.models.multiBarHorizontal = function() {
                     .attr('x', function(d,i) { return getY(d,i) < 0 ? -4 : y(getY(d,i)) - y(0) + 4 })
                 else barsText
                     .attr('text-anchor', 'middle')
-                    .attr("dominant-baseline", "middle")
+                    .attr("dominant-baseline", 'central')
                     .attr('y', x.rangeBand() / 2.0)
                     //.attr('dy', '.32em')
                     .attr('x', function(d,i) { return y(getY(d,i) / 2.0) - y(0) })
@@ -248,7 +248,7 @@ nv.models.multiBarHorizontal = function() {
             if (showSum && stacked)
                 d3.select(groups[0].slice(-1)[0]).selectAll('g').append('text').classed('nv-sum-label', true)
                     .attr('text-anchor', 'start')
-                    .attr("dominant-baseline", "middle")
+                    .attr('dominant-baseline', 'central')
                     .attr('y', x.rangeBand() / 2.0)
                     .attr('x', function(d,i) { console.log(d); return y(getY(d,i)) - y(0) + 4 })
                     .text(function(d,i) {
