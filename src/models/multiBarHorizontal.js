@@ -250,7 +250,7 @@ nv.models.multiBarHorizontal = function() {
                     .attr('text-anchor', 'start')
                     .attr('dominant-baseline', 'central')
                     .attr('y', x.rangeBand() / 2.0)
-                    .attr('x', function(d,i) { console.log(d); return y(getY(d,i)) - y(0) + 4 })
+                    .attr('x', function(d,i) { return y(getY(d,i)) - y(0) + 4 })
                     .text(function(d,i) {
                             var t = valueFormat(d.y1 + d.y, d, 'sum')
                             return t;
