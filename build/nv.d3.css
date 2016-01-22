@@ -1,6 +1,6 @@
-/* nvd3 version 1.8.1-dev (https://github.com/novus/nvd3) 2016-01-20 */
+/* nvd3 version 1.8.1-dev (https://github.com/novus/nvd3) 2016-01-22 */
 .nvd3 .nv-axis {
-    pointer-events:none;
+    /*pointer-events:none;*/
     opacity: 1;
 }
 

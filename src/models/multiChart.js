@@ -13,6 +13,7 @@ nv.models.multiChart = function() {
         noData = null,
         yDomain1,
         yDomain2,
+        xAxisOrdinal = false,
         getX = function(d) { return d.x },
         getY = function(d) { return d.y},
         interpolate = 'monotone',
@@ -42,7 +43,7 @@ nv.models.multiChart = function() {
         stack1 = nv.models.stackedArea().yScale(yScale1),
         stack2 = nv.models.stackedArea().yScale(yScale2),
 
-        xAxis = nv.models.axis().scale(x).orient('bottom').tickPadding(5),
+        xAxis = nv.models.axis(),
         yAxis1 = nv.models.axis().scale(yScale1).orient('left'),
         yAxis2 = nv.models.axis().scale(yScale2).orient('right'),
 
@@ -95,8 +96,18 @@ nv.models.multiChart = function() {
                     })
                 });
 
-            x   .domain(d3.extent(d3.merge(series1.concat(series2)), function(d) { return getX(d) }))
-                .range([0, availableWidth]);
+            // Setup X-scale and X-axis
+            if (!xAxisOrdinal) {
+                x = d3.scale.linear();
+                x.domain(d3.extent(d3.merge(series1.concat(series2)), function(d) { return getX(d) }))
+                 .range([0, availableWidth]);
+            } else {
+                x = d3.scale.ordinal();
+                x.domain(series1[0].map(function(d) { return getX(d) }));
+                x.rangeBands([0, availableWidth], bars1.groupSpacing());
+            }
+            xAxis.scale(x).orient('bottom').tickPadding(5);
+            
 
             var wrap = container.selectAll('g.wrap.multiChart').data([data]);
             var gEnter = wrap.enter().append('g').attr('class', 'wrap nvd3 multiChart').append('g');
@@ -260,11 +271,11 @@ nv.models.multiChart = function() {
 
             g.select('.nv-y1.nv-axis')
                 .classed('nv-disabled', series1.length ? false : true)
-                .attr('transform', 'translate(' + x.range()[0] + ',0)');
+                .attr('transform', 'translate(' + 0 + ',0)');
 
             g.select('.nv-y2.nv-axis')
                 .classed('nv-disabled', series2.length ? false : true)
-                .attr('transform', 'translate(' + x.range()[1] + ',0)');
+                .attr('transform', 'translate(' + availableWidth + ',0)');
 
             legend.dispatch.on('stateChange', function(newState) {
                 chart.update();
@@ -498,6 +509,7 @@ nv.models.multiChart = function() {
         showLegend: {get: function(){return showLegend;}, set: function(_){showLegend=_;}},
         yDomain1:      {get: function(){return yDomain1;}, set: function(_){yDomain1=_;}},
         yDomain2:    {get: function(){return yDomain2;}, set: function(_){yDomain2=_;}},
+        xAxisOrdinal:    {get: function(){return xAxisOrdinal;}, set: function(_){xAxisOrdinal=_;}},
         noData:    {get: function(){return noData;}, set: function(_){noData=_;}},
         interpolate:    {get: function(){return interpolate;}, set: function(_){interpolate=_;}},
         legendRightAxisHint:    {get: function(){return legendRightAxisHint;}, set: function(_){legendRightAxisHint=_;}},
