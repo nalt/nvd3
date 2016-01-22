@@ -1,5 +1,5 @@
 .nvd3 .nv-axis {
-    pointer-events:none;
+    /*pointer-events:none;*/
     opacity: 1;
 }
 

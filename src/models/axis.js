@@ -18,14 +18,16 @@ nv.models.axis = function() {
         , staggerLabels = false
         , isOrdinal = false
         , ticks = null
+        , tickFormat = null
+        , tickValues = null
         , axisLabelDistance = 0
         , duration = 250
-        , dispatch = d3.dispatch('renderEnd')
+        , dispatch = d3.dispatch('renderEnd', 'elementClick')
         ;
     axis
         .scale(scale)
         .orient('bottom')
-        .tickFormat(function(d) { return d })
+        .tickFormat(function(d) { return d });
     ;
 
     //============================================================
@@ -51,6 +53,10 @@ nv.models.axis = function() {
                 axis.ticks(ticks);
             else if (axis.orient() == 'top' || axis.orient() == 'bottom')
                 axis.ticks(Math.abs(scale.range()[1] - scale.range()[0]) / 100);
+            if (tickFormat)
+                axis.tickFormat(tickFormat);
+            if (tickValues)
+                axes.tickValues(tickValues)
 
             //TODO: consider calculating width/height based on whether or not label is added, for reference in charts using this component
             g.watchTransition(renderWatch, 'axis').call(axis);
@@ -329,6 +335,14 @@ nv.models.axis = function() {
             //store old scales for use in transitions on update
             scale0 = scale.copy();
 
+            var ticks = g.selectAll('g').select("text");
+            ticks.on('click', function(d,i) {
+                    dispatch.elementClick({
+                        data: d,
+                        index: i
+                    });
+                })
+
         });
 
         renderWatch.renderEnd('axis immediate');
@@ -354,6 +368,8 @@ nv.models.axis = function() {
         axisLabel:         {get: function(){return axisLabelText;}, set: function(_){axisLabelText=_;}},
         height:            {get: function(){return height;}, set: function(_){height=_;}},
         ticks:             {get: function(){return ticks;}, set: function(_){ticks=_;}},
+        tickFormat:        {get: function(){return tickFormat;}, set: function(_){tickFormat=_;}},
+        tickValues:        {get: function(){return tickValues;}, set: function(_){tickValues=_;}},
         width:             {get: function(){return width;}, set: function(_){width=_;}},
 
         // options that require extra logic in the setter
